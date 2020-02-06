@@ -1,45 +1,69 @@
-// Node.js + Express server backend for petsapp
-// version 3 - use Firebase API as a database, which is called from the
-// frontend, so nothing needs to be in the backend except for static_files
-//
-// COGS121 by Philip Guo
-// https://github.com/pgbovine/COGS121
-
-// Prerequisites - first run:
-//   npm install
-//
-// which will look in package.json and install all dependencies
-// (e.g., express)
-//
-// To start the server, run:
-//   node server.js
-//
-// and open the frontend webpage at http://localhost:3000/petsapp.html
-//
-//
-// [optional] you can use nodemon to automatically restart your Node.js
-// server whenever your backend files change. https://nodemon.io/
-//
-// Install globally using:
-//
-// sudo npm install -g nodemon
-//
-// and then start the server using:
-//   nodemon server.js
-
 const express = require('express');
 const app = express();
 
-// put all of your static files (e.g., HTML, CSS, JS, JPG) in the static_files/
-// sub-directory, and the server will serve them from there. e.g.,:
-//
-// http://localhost:3000/petsapp.html
-// http://localhost:3000/cat.jpg
-//
-// will send the file static_files/cat.jpg to the user's web browser
-//
-// Learn more: http://expressjs.com/en/starter/static-files.html
+
+const sqlite3 = require('sqlite3');
+const db = new sqlite3.Database('.db');
+
 app.use(express.static('static_files'));
+
+app.get('/users', (req, res) => {
+  db.all('SELECT name FROM scales', (err, rows) => {
+    console.log(rows);
+    const allUsernames = rows.map(e => e.name);
+    console.log(allUsernames);
+    res.send(allUsernames);
+  });
+});
+
+
+
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({extended: true})); // hook up with your app
+app.post('/users', (req, res) => {
+  console.log(req.body);
+
+  db.run(
+    'INSERT INTO scales VALUES ($name, $job)',
+    // parameters to SQL query:
+    {
+      $name: req.body.name,
+      $job: req.body.job,
+    },
+    // callback function to run when the query finishes:
+    (err) => {
+      if (err) {
+        res.send({message: 'error in app.post(/users)'});
+      } else {
+        res.send({message: 'successfully run app.post(/users)'});
+      }
+    }
+  );
+});
+
+
+app.get('/users/:userid', (req, res) => {
+  const nameToLookup = req.params.userid; // matches ':userid' above
+
+  // db.all() fetches all results from an SQL query into the 'rows' variable:
+  db.all(
+    'SELECT * FROM scales WHERE name=$name',
+    // parameters to SQL query:
+    {
+      $name: nameToLookup
+    },
+    // callback function to run when the query finishes:
+    (err, rows) => {
+      console.log(rows);
+      if (rows.length > 0) {
+        res.send(rows[0]);
+      } else {
+        res.send({}); // failed, so return an empty object instead of undefined
+      }
+    }
+  );
+});
+
 
 // start the server at URL: http://localhost:3000/
 app.listen(3000, () => {
