@@ -16,32 +16,6 @@ app.get('/users', (req, res) => {
   });
 });
 
-
-
-const bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({extended: true})); // hook up with your app
-app.post('/users', (req, res) => {
-  console.log(req.body);
-
-  db.run(
-    'INSERT INTO scales VALUES ($name, $job)',
-    // parameters to SQL query:
-    {
-      $name: req.body.name,
-      $job: req.body.job,
-    },
-    // callback function to run when the query finishes:
-    (err) => {
-      if (err) {
-        res.send({message: 'error in app.post(/users)'});
-      } else {
-        res.send({message: 'successfully run app.post(/users)'});
-      }
-    }
-  );
-});
-
-
 app.get('/users/:userid', (req, res) => {
   const nameToLookup = req.params.userid; // matches ':userid' above
 
