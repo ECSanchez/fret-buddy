@@ -53,7 +53,6 @@ function checkLoad() {
         if (event.target.readyState === "interactive") {
             genFretboard(0);
         }
-
     });
 }
 
