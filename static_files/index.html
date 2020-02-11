@@ -14,7 +14,23 @@
         FretBuddy v1
     </h1>
 
-    <table id="fretboard"></table>
+    <div id="fretLocation">
+      <!-- <table id="fretboard"></table> -->
+    </div>
+    
 
+    <br>
+
+    <form action="">
+        <select id="keySelect"  size="4">
+          <option selected value="C">C</option>
+          <option value="D">D</option>
+          <option value="E">E</option>
+          <option value="F">F</option>
+        </select>
+        <br><br>
+        
+      </form>
+      <button onclick="keyButton()">Key Change</button>
 </body>
 </html>
